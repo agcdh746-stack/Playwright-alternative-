@@ -8,7 +8,7 @@ ENV PATH="/opt/tbp-venv/bin:$PATH"
 
 # ---- System packages ----
 RUN apt-get update && apt-get install -y \
-    firefox xvfb xdotool xclip openbox \
+    firefox xvfb xdotool xclip openbox git \
     python3 python3-pip python3-venv \
     wget curl ca-certificates gnupg unzip procps \
     && rm -rf /var/lib/apt/lists/*
@@ -29,10 +29,10 @@ RUN ARCH=$(uname -m) && \
     chmod +x /usr/local/bin/xray && \
     rm -rf /tmp/xray /tmp/xray.zip
 
-# ---- tbp in venv ----
+# ---- tbp from GitHub ----
 RUN python3 -m venv /opt/tbp-venv && \
     /opt/tbp-venv/bin/pip install --upgrade pip && \
-    /opt/tbp-venv/bin/pip install termux-browser-pilot
+    /opt/tbp-venv/bin/pip install git+https://github.com/salviz/termux-browser-pilot.git
 
 # ---- App ----
 WORKDIR /app
