@@ -2,14 +2,14 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DISPLAY=:99
-ENV TBP_SERVER_PORT=7860
 ENV XRAY_BIN=/usr/local/bin/xray
 ENV NODE_ENV=production
+ENV PATH="/opt/tbp-venv/bin:$PATH"
 
 # ---- System packages ----
 RUN apt-get update && apt-get install -y \
     firefox xvfb xdotool xclip openbox \
-    python3 python3-pip \
+    python3 python3-pip python3-venv \
     wget curl ca-certificates gnupg unzip procps \
     && rm -rf /var/lib/apt/lists/*
 
@@ -29,8 +29,10 @@ RUN ARCH=$(uname -m) && \
     chmod +x /usr/local/bin/xray && \
     rm -rf /tmp/xray /tmp/xray.zip
 
-# ---- tbp ----
-RUN pip3 install --break-system-packages termux-browser-pilot
+# ---- tbp in venv ----
+RUN python3 -m venv /opt/tbp-venv && \
+    /opt/tbp-venv/bin/pip install --upgrade pip && \
+    /opt/tbp-venv/bin/pip install termux-browser-pilot
 
 # ---- App ----
 WORKDIR /app
