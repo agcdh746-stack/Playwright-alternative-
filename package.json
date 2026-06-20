@@ -1,0 +1,16 @@
+{
+  "name": "grok-tbp-bot",
+  "version": "1.0.0",
+  "description": "Groq AI + tbp Browser Automation Telegram Bot",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "dependencies": {
+    "groq-sdk": "^0.9.0",
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
