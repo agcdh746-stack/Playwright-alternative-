@@ -178,8 +178,22 @@ async function executeTool(name, args) {
   }
 }
 
+
+// ---- Tool status messages ----
+const toolStatus = {
+  browser_goto:            (a) => `🌐 যাচ্ছি: ${a.url}`,
+  browser_click:           (a) => `👆 ক্লিক করছি: ${a.selector}`,
+  browser_type:            (a) => `⌨️ টাইপ করছি: "${a.text}"`,
+  browser_get_links:       ()  => `🔗 লিংক বের করছি...`,
+  browser_get_text:        ()  => `📄 টেক্সট পড়ছি...`,
+  browser_screenshot:      ()  => `📸 স্ক্রিনশট নিচ্ছি...`,
+  browser_network_capture: (a) => a.start ? `📡 নেটওয়ার্ক ক্যাপচার শুরু...` : `📡 নেটওয়ার্ক লগ দেখছি...`,
+  browser_eval:            ()  => `⚙️ JavaScript রান করছি...`,
+  browser_wait:            (a) => `⏳ ${a.seconds} সেকেন্ড অপেক্ষা...`,
+};
+
 // ---- Agentic loop ----
-async function runAgent(userId, userMessage) {
+async function runAgent(userId, userMessage, chatId, bot) {
   if (!history[userId]) history[userId] = [];
 
   history[userId].push({ role: 'user', content: userMessage });
@@ -217,6 +231,13 @@ mp4, m3u8, .ts links গুলো video URL।
     for (const tc of assistantMessage.tool_calls) {
       const args = JSON.parse(tc.function.arguments);
       console.log(`[Tool] ${tc.function.name}`, args);
+
+      // Telegram status update
+      const statusFn = toolStatus[tc.function.name];
+      if (statusFn && chatId && bot) {
+        const statusMsg = statusFn(args);
+        await bot.sendMessage(chatId, statusMsg).catch(() => {});
+      }
 
       const result = await executeTool(tc.function.name, args);
       toolResults.push({
@@ -276,7 +297,7 @@ bot.on('message', async (msg) => {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    const reply = await runAgent(userId, text);
+    const reply = await runAgent(userId, text, chatId, bot);
 
     // Screenshot পাঠাও যদি থাকে
     if (reply.includes('screenshot_path')) {
