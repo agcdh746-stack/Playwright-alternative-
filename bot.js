@@ -202,6 +202,8 @@ mp4, m3u8, .ts links গুলো video URL।
     messages,
     tools,
     tool_choice: 'auto',
+      parallel_tool_calls: false,
+    temperature: 0,
     max_tokens: 2048
   });
 
@@ -227,10 +229,12 @@ mp4, m3u8, .ts links গুলো video URL।
     history[userId].push(...toolResults);
 
     response = await groq.chat.completions.create({
-     model: 'llama3-groq-70b-8192-tool-use-preview',
+      model: 'llama-3.3-70b-versatile',
       messages: [messages[0], ...history[userId]],
       tools,
       tool_choice: 'auto',
+      parallel_tool_calls: false,
+      temperature: 0,
       max_tokens: 2048
     });
 
